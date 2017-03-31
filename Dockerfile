@@ -1,4 +1,4 @@
-FROM acusensehub/keras-theano:cpu
+FROM acusensehub/scikit-opencv:py-2.7
 
 VOLUME ["/home/_data", "/home/_inputs", "/home/_outputs", "/home/src"]
 
@@ -15,7 +15,6 @@ ENV SRC_DIR=/home/src
 RUN sudo apt-get update -y
 
 # Numpy / Scipy reqs
-RUN sudo apt-get install python-matplotlib
 RUN sudo apt-get install ipython -y
 RUN sudo apt-get install ipython-notebook -y
 RUN sudo apt-get install python-pandas -y
