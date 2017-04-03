@@ -3,6 +3,10 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
+import cPickle
+import os
+import json
+import glob
 from sklearn import datasets, linear_model
 
 # Load the diabetes dataset
@@ -12,13 +16,17 @@ diabetes = datasets.load_diabetes()
 # Use only one feature
 diabetes_X = diabetes.data[:, np.newaxis, 2]
 
+with open(os.environ['INPUT_DIR']+'/config.json') as f:
+     config = json.load(f)
+
 # Split the data into training/testing sets
-diabetes_X_train = diabetes_X[:-20]
-diabetes_X_test = diabetes_X[-20:]
+split_val = config['split_val']
+diabetes_X_train = diabetes_X[:-1*split_val]
+diabetes_X_test = diabetes_X[-1*split_val:]
 
 # Split the targets into training/testing sets
-diabetes_y_train = diabetes.target[:-20]
-diabetes_y_test = diabetes.target[-20:]
+diabetes_y_train = diabetes.target[:-1*split_val]
+diabetes_y_test = diabetes.target[-1*split_val:]
 
 # Create linear regression object
 regr = linear_model.LinearRegression()
@@ -27,12 +35,21 @@ regr = linear_model.LinearRegression()
 regr.fit(diabetes_X_train, diabetes_y_train)
 
 # The coefficients
-print('Coefficients: \n', regr.coef_)
+coefficients = regr.coef_[0]
+mse = np.mean((regr.predict(diabetes_X_test) - diabetes_y_test) ** 2)
+variance_score = regr.score(diabetes_X_test, diabetes_y_test)
+print('Coefficients: \n', coefficients)
 # The mean squared error
-print("Mean squared error: %.2f"
-      % np.mean((regr.predict(diabetes_X_test) - diabetes_y_test) ** 2))
+print("Mean squared error: %.2f"% mse)
 # Explained variance score: 1 is perfect prediction
-print('Variance score: %.2f' % regr.score(diabetes_X_test, diabetes_y_test))
+print('Variance score: %.2f' % variance_score)
+
+# save the classifier
+with open(os.environ['OUTPUT_DIR']+'/model.pkl','wb') as fid:
+     cPickle.dump(regr, fid)
+
+with open(os.environ['OUTPUT_DIR']+'/stats.json', 'wb') as f:
+ f.write(json.dumps({"cofficients": str(coefficients), "mse": str(mse),"variance_score":str(variance_score)}))
 
 # Plot outputs
 plt.scatter(diabetes_X_test, diabetes_y_test,  color='black')
@@ -42,4 +59,4 @@ plt.plot(diabetes_X_test, regr.predict(diabetes_X_test), color='blue',
 plt.xticks(())
 plt.yticks(())
 
-plt.show()
+plt.savefig(os.environ['OUTPUT_DIR']+'/performance.png')
