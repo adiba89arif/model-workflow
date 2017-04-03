@@ -49,7 +49,7 @@ with open(os.environ['OUTPUT_DIR']+'/model.pkl','wb') as fid:
      cPickle.dump(regr, fid)
 
 with open(os.environ['OUTPUT_DIR']+'/stats.json', 'wb') as f:
- f.write(json.dumps({"cofficients": str(coefficients), "mse": str(mse),"variance_score":str(variance_score)}))
+ f.write(json.dumps({"cofficients": coefficients, "mse": mse,"variance_score":variance_score}))
 
 # Plot outputs
 plt.scatter(diabetes_X_test, diabetes_y_test,  color='black')
