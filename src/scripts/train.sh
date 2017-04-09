@@ -1,2 +1,3 @@
 #!/bin/bash
-python regression.py 
+#python regression.py
+python mnist_cnn.py 
