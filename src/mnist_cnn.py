@@ -6,10 +6,12 @@ Gets to 99.25% test accuracy after 12 epochs
 
 from __future__ import print_function
 import keras
+import os, json
 from keras.datasets import mnist
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Flatten
 from keras.layers import Conv2D, MaxPooling2D
+from keras.callbacks import ModelCheckpoint
 from keras import backend as K
 
 batch_size = 128
@@ -59,11 +61,26 @@ model.compile(loss=keras.losses.categorical_crossentropy,
               optimizer=keras.optimizers.Adadelta(),
               metrics=['accuracy'])
 
+# checkpoint
+filepath= os.environ['OUTPUT_DIR']+ "/model-{epoch:02d}-{val_acc:.2f}.hdf5"
+checkpoint = ModelCheckpoint(filepath, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+callbacks_list = [checkpoint]
+
 model.fit(x_train, y_train,
           batch_size=batch_size,
           epochs=epochs,
           verbose=1,
+          callbacks=callbacks_list,
           validation_data=(x_test, y_test))
+
 score = model.evaluate(x_test, y_test, verbose=0)
+# save the classifier
+model.save_weights(os.environ['OUTPUT_DIR']+"/model.h5")
+print("Saved model to disk")
+
+with open(os.environ['OUTPUT_DIR']+'/stats.json', 'wb') as f:
+    f.write(json.dumps({"test_loss": score[0], "test_accuracy": score[1]}))
+
+
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
