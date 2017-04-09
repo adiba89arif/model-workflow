@@ -1,4 +1,5 @@
-FROM acusensehub/scikit-opencv:py-2.7
+#FROM acusensehub/scikit-opencv:py-2.7
+FROM acusensehub/keras-theano:cpu
 
 VOLUME ["/home/_data", "/home/_inputs", "/home/_outputs", "/home/src"]
 
