@@ -21,6 +21,8 @@ RUN sudo apt-get install ipython-notebook -y
 RUN sudo apt-get install python-pandas -y
 RUN sudo apt-get install python-sympy -y
 
+RUN pip install flask
+EXPOSE 5000
 RUN mkdir -p /home/src
 
 COPY src /home/src
